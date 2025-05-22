@@ -31,5 +31,5 @@ Follow the steps below to get CoreAI up and running:
 3. Find the function or variable called `AskGemini`  
 4. Replace the placeholder text `"YOUR_GEMINI_API_HERE"` with the API key you copied earlier. It should look something like this:
 
-```js
-const AskGemini = "YOUR_ACTUAL_GEMINI_API_KEY";
+``js
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_API_HERE;``
