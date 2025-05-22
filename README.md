@@ -1,35 +1,38 @@
 # CoreAI
 
-CoreAI is an open-source AI project that leverages the Gemini API to provide powerful AI functionalities. This project is designed to be easy to set up and customize so you can integrate advanced AI features into your own applications.
+CoreAI is an open-source AI assistant powered by the [Google Gemini API](https://aistudio.google.com/app/apikey). This lightweight AI interface is built with HTML, CSS, and JavaScript, allowing you to send prompts and receive AI-generated responses right in your browser.
 
 ---
 
-## Features
+## 🚀 Features
 
-- Lightweight AI powered by Gemini API
-- Simple JavaScript interface for making AI requests
-- Fully customizable by replacing your Gemini API key
+- Uses Google's Gemini 2.0 Flash model
+- Simple browser-based interface
+- 100% client-side — no backend required
+- Easy to set up with your own API key
 
 ---
 
-## Getting Started
+## 🔧 How to Set It Up
 
-Follow the steps below to get CoreAI up and running:
+Follow these steps to get CoreAI working with your own Gemini API key:
 
-### 1. Create a Gemini API Key
+### 1. Get Your Gemini API Key
 
-1. Go to the [Gemini API website](https://developers.gemini.com)  
-2. Sign up for a free account or log in if you already have one  
-3. Navigate to your account dashboard and find the **API Keys** section  
-4. Create a new API key  
-5. Copy the generated API key — you will need it in the next steps
+1. Go to the official Gemini API key page:  
+   👉 [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
 
-### 2. Configure CoreAI
+2. **Log in** or **Sign up** with your Google account  
+3. Click on **"Create API Key"** under the "API Keys" section  
+4. **Copy** the newly created key
 
-1. Open the project folder on your computer  
-2. Open the `script.js` file with a text editor (like VS Code, Notepad++, or even a simple text editor)  
-3. Find the function or variable called `AskGemini`  
-4. Replace the placeholder text `"YOUR_GEMINI_API_HERE"` with the API key you copied earlier. It should look something like this:
+---
 
-``js
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_API_HERE;``
+### 2. Plug Your API Key into the Code
+
+1. Open the project folder (e.g. `CoreAI`)  
+2. Open the `script.js` file in a text editor  
+3. Find this line:
+
+```js
+const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_API_HERE');
