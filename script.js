@@ -3,15 +3,13 @@ const input = document.getElementById('input');
 const sendBtn = document.getElementById('sendBtn');
 const loadingBarContainer = document.getElementById('loadingBarContainer');
 
-function parseFormatting(text) {
-  text = text.replace(/```([\s\S]+?)```/g, (m, p1) => {
-    return `<span class="code">${escapeHtml(p1)}</span>`;
-  });
-  text = text.replace(/\*\*(.+?)\*\*/g, (m, p1) => {
-    return `<span class="bold">${escapeHtml(p1)}</span>`;
-  });
-  return text;
-}
+const tabsContainer = document.getElementById('tabsContainer');
+const newChatBtn = document.getElementById('newChatBtn');
+
+let chats = []; // { id, title, messages: [{sender, text}] }
+let activeChatId = null;
+
+// UTILITIES
 
 function escapeHtml(unsafe) {
   return unsafe.replace(/[&<>"']/g, function(m) {
@@ -25,36 +23,119 @@ function escapeHtml(unsafe) {
   });
 }
 
+function parseFormatting(text) {
+  text = text.replace(/```([\s\S]+?)```/g, (m, p1) => {
+    return `<span class="code">${escapeHtml(p1)}</span>`;
+  });
+  text = text.replace(/\*\*(.+?)\*\*/g, (m, p1) => {
+    return `<span class="bold">${escapeHtml(p1)}</span>`;
+  });
+  return text;
+}
+
+// CHAT MANAGEMENT
+
+function saveChats() {
+  localStorage.setItem('chatTabs', JSON.stringify(chats));
+  localStorage.setItem('activeChatId', activeChatId);
+}
+
+function loadChats() {
+  const saved = localStorage.getItem('chatTabs');
+  const savedActive = localStorage.getItem('activeChatId');
+
+  if (saved) {
+    chats = JSON.parse(saved);
+    activeChatId = savedActive || (chats.length ? chats[0].id : null);
+  } else {
+    // Init default chat
+    chats = [{ id: generateId(), title: "New Chat", messages: [] }];
+    activeChatId = chats[0].id;
+  }
+}
+
+function generateId() {
+  return 'chat-' + Math.random().toString(36).substr(2, 9);
+}
+
+function renderTabs() {
+  tabsContainer.innerHTML = '';
+  chats.forEach(chat => {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (chat.id === activeChatId ? ' active' : '');
+    tab.textContent = chat.title;
+    tab.title = chat.title;
+
+    // Close button for tabs except first one
+    if (chats.length > 1) {
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'close-btn';
+      closeBtn.innerHTML = '&times;';
+      closeBtn.onclick = e => {
+        e.stopPropagation();
+        deleteChat(chat.id);
+      };
+      tab.appendChild(closeBtn);
+    }
+
+    tab.onclick = () => {
+      if (chat.id !== activeChatId) {
+        activeChatId = chat.id;
+        renderTabs();
+        renderChatArea();
+        saveChats();
+      }
+    };
+
+    tabsContainer.appendChild(tab);
+  });
+}
+
+function deleteChat(id) {
+  const index = chats.findIndex(c => c.id === id);
+  if (index === -1) return;
+  chats.splice(index, 1);
+
+  // If deleted active chat, switch to another
+  if (id === activeChatId) {
+    activeChatId = chats.length ? chats[0].id : null;
+  }
+
+  renderTabs();
+  renderChatArea();
+  saveChats();
+}
+
+function renderChatArea() {
+  chatArea.innerHTML = '';
+  if (!activeChatId) return;
+
+  const chat = chats.find(c => c.id === activeChatId);
+  if (!chat) return;
+
+  chat.messages.forEach(({sender, text}) => {
+    addMessage(sender, text, false);
+  });
+}
+
 function addMessage(sender, text, save = true) {
   const div = document.createElement('div');
   div.className = 'message ' + sender;
   div.innerHTML = parseFormatting(text);
   chatArea.appendChild(div);
   chatArea.scrollTop = chatArea.scrollHeight;
-  
-  if (save) {
-    saveChat();
+
+  if (save && activeChatId) {
+    const chat = chats.find(c => c.id === activeChatId);
+    chat.messages.push({ sender, text });
+    saveChats();
   }
 }
 
-function saveChat() {
-  const messages = [];
-  chatArea.querySelectorAll('.message').forEach(msgDiv => {
-    const sender = msgDiv.classList.contains('user') ? 'user' : 'bot';
-    const text = msgDiv.textContent || '';
-    messages.push({ sender, text });
-  });
-  localStorage.setItem('chatMessages', JSON.stringify(messages));
-}
-
-function loadChat() {
-  const saved = localStorage.getItem('chatMessages');
-  if (!saved) return;
-  
-  const messages = JSON.parse(saved);
-  messages.forEach(({sender, text}) => {
-    addMessage(sender, text, false);
-  });
+function setLoading(isLoading) {
+  input.disabled = isLoading;
+  sendBtn.disabled = isLoading;
+  loadingBarContainer.style.display = isLoading ? 'block' : 'none';
 }
 
 async function send() {
@@ -73,12 +154,6 @@ async function send() {
   }
 
   setLoading(false);
-}
-
-function setLoading(isLoading) {
-  input.disabled = isLoading;
-  sendBtn.disabled = isLoading;
-  loadingBarContainer.style.display = isLoading ? 'block' : 'none';
 }
 
 input.addEventListener('keydown', e => {
@@ -109,4 +184,19 @@ async function askGemini(prompt) {
   }
 }
 
-loadChat();
+newChatBtn.onclick = () => {
+  const newChat = {
+    id: generateId(),
+    title: `Chat ${chats.length + 1}`,
+    messages: []
+  };
+  chats.push(newChat);
+  activeChatId = newChat.id;
+  renderTabs();
+  renderChatArea();
+  saveChats();
+};
+
+loadChats();
+renderTabs();
+renderChatArea();
