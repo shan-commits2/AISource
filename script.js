@@ -89,7 +89,7 @@ input.addEventListener('keydown', e => {
 });
 
 async function askGemini(prompt) {
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCFjDmsbbVMA4rQhIiJVuTOYYDajIpIA2w', {
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_API_HERE', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
