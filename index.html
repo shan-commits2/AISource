@@ -7,15 +7,27 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="chat-area" id="chatArea"></div>
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Chats</h2>
+        <button id="newChatBtn" title="New Chat">+</button>
+      </div>
+      <div id="tabsContainer"></div>
+    </aside>
 
-  <div id="loadingBarContainer" style="display:none;">
-    <div id="loadingBar"></div>
-  </div>
+    <main class="main-content">
+      <div class="chat-area" id="chatArea"></div>
 
-  <div class="input-bar">
-    <input id="input" type="text" placeholder="Say something..." autocomplete="off" />
-    <button id="sendBtn" onclick="send()">Send</button>
+      <div id="loadingBarContainer" style="display:none;">
+        <div id="loadingBar"></div>
+      </div>
+
+      <div class="input-bar">
+        <input id="input" type="text" placeholder="Say something..." autocomplete="off" />
+        <button id="sendBtn" onclick="send()">Send</button>
+      </div>
+    </main>
   </div>
 
   <script src="script.js"></script>
